@@ -48,7 +48,7 @@ RelaTable Storage Web App
      servlet:
        multipart:
          max-file-size: 25MB
-         max-request-size: 25MB
+         max-request-size: 26MB
    relatable-storage:
      table-name: 'STORAGE'
      schema-name: '<Schema containing the STORAGE table; omit if no schema prefix is needed>'
