@@ -71,12 +71,11 @@ RelaTable Storage Web App
 
 ### WAR
 
-1. Install appropriate JDBC driver in the servlet container or application server.
-2. Set a environment or context variable named `spring.config.location` referencing the directory that contains your custom configuration file.
-3. Build the WAR:
+1. Set a environment or context variable named `spring.config.location` referencing the directory that contains your custom configuration file.
+2. Build the WAR:
 
    ```console
    ./mvnw clean verify -P war
    ```
 
-4. Deploy the WAR.
+3. Deploy the WAR.
