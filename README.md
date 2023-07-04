@@ -25,7 +25,7 @@ RelaTable Storage Web App
 4. Create `STORAGE` table:
 
    ```sql
-   create table storage (
+   create table STORAGE (
        UUID_BASE64URL   varchar(22 /* byte */) not null primary key,
        FILENAME         varchar(1024 /* char */) not null unique,
        CONTENT_LENGTH   numeric(19, 0) /* not null deferrable initially deferred */ check (CONTENT_LENGTH >= 0),
