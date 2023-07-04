@@ -8,7 +8,7 @@ RelaTable Storage Web App
 
    ```sql
    CREATE TABLE users (
-       username        VARCHAR(128 /* CHAR */) NOT NULL UNIQUE,
+       username        VARCHAR(128 /* CHAR */) NOT NULL PRIMARY KEY,
        password        VARCHAR(60 /* BYTE */) NOT NULL,
        creation_time   TIMESTAMP DEFAULT CURRENT_TIMESTAMP NOT NULL
    );
