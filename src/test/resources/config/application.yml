@@ -1,0 +1,25 @@
+spring:
+  jpa:
+    defer-datasource-initialization: true
+    hibernate:
+      ddl-auto: create-only
+    show-sql: true
+    properties:
+      hibernate:
+        format_sql: true
+  datasource:
+    url: 'jdbc:h2:mem:@project.artifactId@'
+    username: root
+    password: root
+  h2:
+    console:
+      enabled: true
+  servlet:
+    multipart:
+      max-file-size: 25MB
+      max-request-size: 25MB
+logging:
+  level:
+    '@project.groupId@': DEBUG
+relatable-storage:
+  table-name: STORAGE
