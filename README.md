@@ -52,7 +52,7 @@ RelaTable Storage Web App
    relatable-storage:
      table-name: 'STORAGE'
      schema-name: '<Schema containing the STORAGE table; omit if no schema prefix is needed>'
-     compression: [NONE|LOW|MEDIUM|HIGH]
+     compression: '<NONE|LOW|MEDIUM|HIGH>'
    ```
 
 ### Standalone JAR
