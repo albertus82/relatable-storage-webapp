@@ -71,7 +71,7 @@ RelaTable Storage Web App
 
 ### WAR
 
-1. Set a environment or context variable named `spring.config.location` referencing the directory that contains your custom configuration file.
+1. Set a environment or context variable named `spring.config.additional-location` referencing the directory that contains your custom configuration file.
 2. Build the WAR:
    
    ```console
