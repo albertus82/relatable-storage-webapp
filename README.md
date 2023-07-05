@@ -7,10 +7,10 @@ RelaTable Storage Web App
 2. Create `USERS` table:
 
    ```sql
-   create table USERS (
-       USERNAME        varchar(128 /* char */) not null primary key,
-       PASSWORD        varchar(60 /* byte */) not null,
-       CREATION_TIME   timestamp default current_timestamp not null
+   CREATE TABLE users (
+       username        VARCHAR(128 /* CHAR */) NOT NULL PRIMARY KEY,
+       password        VARCHAR(60 /* BYTE */) NOT NULL,
+       creation_time   TIMESTAMP DEFAULT CURRENT_TIMESTAMP NOT NULL
    );
    ```
 
@@ -19,21 +19,21 @@ RelaTable Storage Web App
    2. Insert a row into `USERS` table:
 
       ```sql
-      insert into USERS (USERNAME, PASSWORD) values ('admin', <the password hash>);
+      INSERT INTO users (username, password) VALUES ('admin', <the password hash>);
       ```
 
 4. Create `STORAGE` table:
 
    ```sql
-   create table storage (
-       UUID_BASE64URL   varchar(22 /* byte */) not null primary key,
-       FILENAME         varchar(1024 /* char */) not null unique,
-       CONTENT_LENGTH   numeric(19, 0) /* not null deferrable initially deferred */ check (CONTENT_LENGTH >= 0),
-       LAST_MODIFIED    timestamp not null,
-       COMPRESSED       numeric(1, 0) not null check (COMPRESSED in (0, 1)),
-       ENCRYPTED        numeric(1, 0) not null check (ENCRYPTED in (0, 1)),
-       FILE_CONTENTS    blob not null,
-       CREATION_TIME    timestamp default current_timestamp not null
+   CREATE TABLE storage (
+       uuid_base64url   VARCHAR(22 /* BYTE */) NOT NULL PRIMARY KEY,
+       filename         VARCHAR(1024 /* CHAR */) NOT NULL UNIQUE,
+       content_length   NUMERIC(19, 0) /* NOT NULL DEFERRABLE INITIALLY DEFERRED */ CHECK (content_length >= 0),
+       last_modified    TIMESTAMP NOT NULL,
+       compressed       NUMERIC(1, 0) NOT NULL CHECK (compressed IN (0, 1)),
+       encrypted        NUMERIC(1, 0) NOT NULL CHECK (encrypted IN (0, 1)),
+       file_contents    BLOB NOT NULL,
+       creation_time    TIMESTAMP DEFAULT CURRENT_TIMESTAMP NOT NULL
    );
    ```
 
