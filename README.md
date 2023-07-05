@@ -5,7 +5,7 @@ RelaTable Storage Web App
 
 1. Install a RDBMS of your choice (MariaDB, PostgreSQL, ...)
 2. Create `USERS` table:
-
+   
    ```sql
    CREATE TABLE users (
        username        VARCHAR(128 /* CHAR */) NOT NULL PRIMARY KEY,
@@ -17,13 +17,13 @@ RelaTable Storage Web App
 3. Insert a new user:
    1. Generate a Bcrypt encrypted hash of your desired password, e.g. using [bcrypt-generator.com](https://bcrypt-generator.com)
    2. Insert a row into `USERS` table:
-
+      
       ```sql
       INSERT INTO users (username, password) VALUES ('admin', <the password hash>);
       ```
 
 4. Create `STORAGE` table:
-
+   
    ```sql
    CREATE TABLE storage (
        uuid_base64url   VARCHAR(22 /* BYTE */) NOT NULL PRIMARY KEY,
@@ -38,7 +38,7 @@ RelaTable Storage Web App
    ```
 
 5. Create your custom `application.yml` configuration file in a directory of your choice:
-
+   
    ```yml
    spring:
      datasource:
@@ -58,7 +58,7 @@ RelaTable Storage Web App
 ### Standalone JAR
 
 1. Build the JAR:
-
+   
    ```console
    ./mvnw clean verify
    ```
@@ -73,7 +73,7 @@ RelaTable Storage Web App
 
 1. Set a environment or context variable named `spring.config.location` referencing the directory that contains your custom configuration file.
 2. Build the WAR:
-
+   
    ```console
    ./mvnw clean verify -P war
    ```
