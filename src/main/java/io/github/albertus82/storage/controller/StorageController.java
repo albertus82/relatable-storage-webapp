@@ -55,7 +55,7 @@ public class StorageController {
 		}).sorted().toList();
 	}
 
-	@GetMapping("/{filename}")
+	@GetMapping(path="/{filename}", produces = MediaType.APPLICATION_OCTET_STREAM_VALUE)
 	public ResponseEntity<Resource> get(@PathVariable("filename") @NotBlank @Size(max = FILENAME_MAXLENGTH) String filename) throws IOException {
 		final var resource = storageService.get(filename.trim());
 		return ResponseEntity.ok().header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=\"" + resource.getFilename() + '"').contentLength(resource.contentLength()).lastModified(resource.lastModified()).body(resource);
