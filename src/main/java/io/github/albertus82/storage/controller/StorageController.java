@@ -6,6 +6,7 @@ import java.net.MalformedURLException;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.net.URL;
+import java.nio.charset.StandardCharsets;
 import java.util.List;
 
 import org.springframework.core.io.InputStreamResource;
@@ -25,6 +26,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
+import org.springframework.web.util.UriUtils;
 
 import io.github.albertus82.storage.dto.ResourceDTO;
 import io.github.albertus82.storage.service.StorageService;
@@ -47,7 +49,7 @@ public class StorageController {
 	public List<ResourceDTO> get(@RequestParam(name = "patterns", defaultValue = "") String[] patterns, HttpServletRequest request) throws IOException {
 		return storageService.list(patterns).stream().map(resource -> {
 			try {
-				return new ResourceDTO(resource, new URL(request.getRequestURL() + "/" + resource.getFilename()));
+				return new ResourceDTO(resource, new URL(request.getRequestURL() + "/" + encodeFilename(resource)));
 			}
 			catch (final MalformedURLException e) {
 				throw new UncheckedIOException(e);
@@ -55,7 +57,7 @@ public class StorageController {
 		}).sorted().toList();
 	}
 
-	@GetMapping(path="/{filename}", produces = MediaType.APPLICATION_OCTET_STREAM_VALUE)
+	@GetMapping(path = "/{filename}", produces = MediaType.APPLICATION_OCTET_STREAM_VALUE)
 	public ResponseEntity<Resource> get(@PathVariable("filename") @NotBlank @Size(max = FILENAME_MAXLENGTH) String filename) throws IOException {
 		final var resource = storageService.get(filename.trim());
 		return ResponseEntity.ok().header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=\"" + resource.getFilename() + '"').contentLength(resource.contentLength()).lastModified(resource.lastModified()).body(resource);
@@ -64,7 +66,15 @@ public class StorageController {
 	@PostMapping(consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
 	public ResponseEntity<ResourceDTO> post(@RequestParam("file") MultipartFile file, HttpServletRequest request) throws IOException, URISyntaxException {
 		final var resource = storageService.put(new InputStreamResource(file.getInputStream()), file.getOriginalFilename().trim());
-		final var location = new URI(request.getRequestURL().append('/') + resource.getFilename());
+		final var location = new URI(request.getRequestURL().append('/') + encodeFilename(resource));
+		return ResponseEntity.created(location).body(new ResourceDTO(resource, location.toURL()));
+	}
+
+	@PostMapping(consumes = MediaType.MULTIPART_FORM_DATA_VALUE, path = "/{filename}")
+	public ResponseEntity<ResourceDTO> post(@RequestParam("file") MultipartFile file, @PathVariable("filename") @NotBlank @Size(max = FILENAME_MAXLENGTH) String filename, HttpServletRequest request) throws IOException, URISyntaxException {
+		final var resource = storageService.put(new InputStreamResource(file.getInputStream()), filename.trim());
+		final var requestURL = request.getRequestURL();
+		final var location = new URI(requestURL.substring(0, requestURL.lastIndexOf("/") + 1) + encodeFilename(resource));
 		return ResponseEntity.created(location).body(new ResourceDTO(resource, location.toURL()));
 	}
 
@@ -72,13 +82,17 @@ public class StorageController {
 	public ResourceDTO put(@PathVariable("filename") @NotBlank @Size(max = FILENAME_MAXLENGTH) String oldFilename, @RequestParam("new_filename") @NotBlank @Size(max = FILENAME_MAXLENGTH) String newFilename, HttpServletRequest request) throws IOException {
 		final var resource = storageService.move(oldFilename.trim(), newFilename.trim());
 		final var requestURL = request.getRequestURL();
-		return new ResourceDTO(resource, new URL(requestURL.substring(0, requestURL.lastIndexOf("/") + 1) + resource.getFilename()));
+		return new ResourceDTO(resource, new URL(requestURL.substring(0, requestURL.lastIndexOf("/") + 1) + encodeFilename(resource)));
 	}
 
 	@DeleteMapping("/{filename}")
 	@ResponseStatus(HttpStatus.NO_CONTENT)
 	public void delete(@PathVariable("filename") @NotBlank @Size(max = FILENAME_MAXLENGTH) String filename) throws IOException {
 		storageService.delete(filename.trim());
+	}
+
+	private static String encodeFilename(final Resource resource) {
+		return UriUtils.encodePathSegment(resource.getFilename(), StandardCharsets.UTF_8);
 	}
 
 }
