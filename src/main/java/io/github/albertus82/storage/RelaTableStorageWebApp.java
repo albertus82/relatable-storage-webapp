@@ -15,6 +15,10 @@ import lombok.extern.slf4j.Slf4j;
 @SpringBootApplication
 public class RelaTableStorageWebApp extends SpringBootServletInitializer {
 
+	public RelaTableStorageWebApp() {
+		setRegisterErrorPageFilter(false);
+	}
+
 	public static void main(final String... args) {
 		final var context = SpringApplication.run(RelaTableStorageWebApp.class, args);
 		log.atDebug().log(() -> "Beans:" + System.lineSeparator() + Arrays.stream(context.getBeanDefinitionNames()).sorted().map(beanName -> '\t' + beanName + " ==>> " + context.getType(beanName)).collect(Collectors.joining(System.lineSeparator())));
