@@ -49,7 +49,7 @@ public class StorageController {
 	public List<ResourceDTO> get(@RequestParam(name = "patterns", defaultValue = "") String[] patterns, HttpServletRequest request) throws IOException {
 		return storageService.list(patterns).stream().map(resource -> {
 			try {
-				return new ResourceDTO(resource, new URL(request.getRequestURL() + "?filename=" + encodeFilename(resource.getFilename())));
+				return new ResourceDTO(resource, new URL(request.getRequestURL().append("?filename=") + encodeFilename(resource.getFilename())));
 			}
 			catch (final MalformedURLException e) {
 				throw new UncheckedIOException(e);
@@ -81,8 +81,7 @@ public class StorageController {
 	@PutMapping
 	public ResourceDTO put(@RequestParam("filename") @NotBlank @Size(max = FILENAME_MAXLENGTH) String oldFilename, @RequestParam("new_filename") @NotBlank @Size(max = FILENAME_MAXLENGTH) String newFilename, HttpServletRequest request) throws IOException {
 		final var resource = storageService.move(oldFilename.trim(), newFilename.trim());
-		final var requestURL = request.getRequestURL();
-		return new ResourceDTO(resource, new URL(requestURL.substring(0, requestURL.lastIndexOf("/")) + "?filename=" + encodeFilename(resource.getFilename())));
+		return new ResourceDTO(resource, new URL(request.getRequestURL().append("?filename=") + encodeFilename(resource.getFilename())));
 	}
 
 	@DeleteMapping
