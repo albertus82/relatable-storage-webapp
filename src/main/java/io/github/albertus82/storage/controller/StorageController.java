@@ -8,6 +8,7 @@ import java.net.URISyntaxException;
 import java.net.URL;
 import java.nio.charset.StandardCharsets;
 import java.util.List;
+import java.util.Objects;
 
 import org.springframework.core.io.InputStreamResource;
 import org.springframework.core.io.Resource;
@@ -18,7 +19,6 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -49,7 +49,7 @@ public class StorageController {
 	public List<ResourceDTO> get(@RequestParam(name = "patterns", defaultValue = "") String[] patterns, HttpServletRequest request) throws IOException {
 		return storageService.list(patterns).stream().map(resource -> {
 			try {
-				return new ResourceDTO(resource, new URL(request.getRequestURL() + "/" + encodeFilename(resource)));
+				return new ResourceDTO(resource, new URL(request.getRequestURL() + "?filename=" + encodeFilename(resource.getFilename())));
 			}
 			catch (final MalformedURLException e) {
 				throw new UncheckedIOException(e);
@@ -57,42 +57,43 @@ public class StorageController {
 		}).sorted().toList();
 	}
 
-	@GetMapping(path = "/{filename}", produces = MediaType.APPLICATION_OCTET_STREAM_VALUE)
-	public ResponseEntity<Resource> get(@PathVariable("filename") @NotBlank @Size(max = FILENAME_MAXLENGTH) String filename) throws IOException {
-		final var resource = storageService.get(filename.trim());
-		return ResponseEntity.ok().header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=\"" + resource.getFilename() + '"').contentLength(resource.contentLength()).lastModified(resource.lastModified()).body(resource);
+	@GetMapping(produces = MediaType.APPLICATION_OCTET_STREAM_VALUE, params = "filename")
+	public ResponseEntity<Resource> get(@RequestParam(name = "filename", required = false) @Size(max = FILENAME_MAXLENGTH) String filename) throws IOException {
+		if (filename == null || filename.isBlank()) {
+			throw new IllegalArgumentException("filename must not be null or blank");
+		}
+		filename = filename.trim();
+		final var resource = storageService.get(filename);
+		return ResponseEntity.ok().header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename*=UTF-8''" + UriUtils.encodeFragment(filename.substring(filename.lastIndexOf('/') + 1), StandardCharsets.UTF_8)).contentLength(resource.contentLength()).lastModified(resource.lastModified()).body(resource);
 	}
 
 	@PostMapping(consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
-	public ResponseEntity<ResourceDTO> post(@RequestParam("file") MultipartFile file, HttpServletRequest request) throws IOException, URISyntaxException {
-		final var resource = storageService.put(new InputStreamResource(file.getInputStream()), file.getOriginalFilename().trim());
-		final var location = new URI(request.getRequestURL().append('/') + encodeFilename(resource));
-		return ResponseEntity.created(location).body(new ResourceDTO(resource, location.toURL()));
-	}
-
-	@PostMapping(consumes = MediaType.MULTIPART_FORM_DATA_VALUE, path = "/{filename}")
-	public ResponseEntity<ResourceDTO> post(@RequestParam("file") MultipartFile file, @PathVariable("filename") @NotBlank @Size(max = FILENAME_MAXLENGTH) String filename, HttpServletRequest request) throws IOException, URISyntaxException {
+	public ResponseEntity<ResourceDTO> post(@RequestParam("file") MultipartFile file, @RequestParam(name = "filename", defaultValue = "") @Size(max = FILENAME_MAXLENGTH) String customFilename, HttpServletRequest request) throws IOException, URISyntaxException {
+		final var filename = customFilename == null || customFilename.isBlank() ? file.getOriginalFilename() : customFilename;
+		if (filename == null || filename.isBlank()) {
+			throw new IllegalArgumentException("filename must not be null or blank");
+		}
 		final var resource = storageService.put(new InputStreamResource(file.getInputStream()), filename.trim());
-		final var requestURL = request.getRequestURL();
-		final var location = new URI(requestURL.substring(0, requestURL.lastIndexOf("/") + 1) + encodeFilename(resource));
+		final var location = new URI(request.getRequestURL().append("?filename=") + encodeFilename(resource.getFilename()));
 		return ResponseEntity.created(location).body(new ResourceDTO(resource, location.toURL()));
 	}
 
-	@PutMapping("/{filename}")
-	public ResourceDTO put(@PathVariable("filename") @NotBlank @Size(max = FILENAME_MAXLENGTH) String oldFilename, @RequestParam("new_filename") @NotBlank @Size(max = FILENAME_MAXLENGTH) String newFilename, HttpServletRequest request) throws IOException {
+	@PutMapping
+	public ResourceDTO put(@RequestParam("filename") @NotBlank @Size(max = FILENAME_MAXLENGTH) String oldFilename, @RequestParam("new_filename") @NotBlank @Size(max = FILENAME_MAXLENGTH) String newFilename, HttpServletRequest request) throws IOException {
 		final var resource = storageService.move(oldFilename.trim(), newFilename.trim());
 		final var requestURL = request.getRequestURL();
-		return new ResourceDTO(resource, new URL(requestURL.substring(0, requestURL.lastIndexOf("/") + 1) + encodeFilename(resource)));
+		return new ResourceDTO(resource, new URL(requestURL.substring(0, requestURL.lastIndexOf("/")) + "?filename=" + encodeFilename(resource.getFilename())));
 	}
 
-	@DeleteMapping("/{filename}")
+	@DeleteMapping
 	@ResponseStatus(HttpStatus.NO_CONTENT)
-	public void delete(@PathVariable("filename") @NotBlank @Size(max = FILENAME_MAXLENGTH) String filename) throws IOException {
+	public void delete(@RequestParam("filename") @NotBlank @Size(max = FILENAME_MAXLENGTH) String filename) throws IOException {
 		storageService.delete(filename.trim());
 	}
 
-	private static String encodeFilename(final Resource resource) {
-		return UriUtils.encodePathSegment(resource.getFilename(), StandardCharsets.UTF_8);
+	private static String encodeFilename(final String filename) {
+		Objects.requireNonNull(filename, "filename must not be null");
+		return UriUtils.encodeQueryParam(filename, StandardCharsets.UTF_8);
 	}
 
 }
