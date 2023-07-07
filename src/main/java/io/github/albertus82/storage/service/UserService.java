@@ -1,9 +1,11 @@
 package io.github.albertus82.storage.service;
 
-import org.springframework.security.core.userdetails.UserDetailsService;
+import java.util.Optional;
+
+import io.github.albertus82.storage.dto.UserDTO;
 
 public interface UserService {
 
-	UserDetailsService userDetailsService();
+	Optional<UserDTO> findByUsername(String username);
 
 }
