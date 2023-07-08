@@ -3,7 +3,7 @@ RelaTable Storage Web App
 
 ## Getting started
 
-1. Install a RDBMS of your choice (MariaDB, PostgreSQL, ...)
+1. Install a RDBMS of your choice, e.g. PostgreSQL, MariaDB (see https://stackoverflow.com/a/59561496/3260495), ...
 2. Create `USERS` table:
    
    ```sql
@@ -32,7 +32,7 @@ RelaTable Storage Web App
        last_modified    TIMESTAMP NOT NULL,
        compressed       NUMERIC(1, 0) NOT NULL CHECK (compressed IN (0, 1)),
        encrypted        NUMERIC(1, 0) NOT NULL CHECK (encrypted IN (0, 1)),
-       file_contents    BLOB NOT NULL,
+       file_contents    BLOB /* LONGBLOB */ NOT NULL,
        creation_time    TIMESTAMP DEFAULT CURRENT_TIMESTAMP NOT NULL
    );
    ```
