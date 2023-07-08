@@ -53,13 +53,13 @@ RelaTable Storage Web App
      table-name: 'STORAGE'   # mandatory
      schema-name: 'MYSCHEMA' # optional, the schema containing the STORAGE table; omit if no schema prefix is needed
      compression: MEDIUM     # optional, choose between [NONE|LOW|MEDIUM|HIGH], default is LOW
-     password: 'P4$$w0Rd'    # optional, enables data encryption
+     password: 'P4$$w0Rd'    # optional, enables data encryption, default is null
    http:
      hsts:
-       enabled: true             # optional, default true
-       max-age: 31536000         # optional, default 31536000 (one year)
-       include-sub-domains: true # optional, default true
-       preload: false            # optional, default false
+       enabled: true             # optional, default is true
+       max-age: 31536000         # optional, default is 31536000 (one year)
+       include-sub-domains: true # optional, default is true
+       preload: false            # optional, default is false
    ```
 
 ### Standalone JAR
