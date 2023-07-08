@@ -20,8 +20,8 @@ import io.github.albertus82.storage.jdbc.write.PipeBasedBinaryStreamProvider;
 public class RootConfig {
 
 	@Bean
-	StorageOperations storage(JdbcOperations jdbcOperations, @Value("${relatable-storage.schema-name:#{null}}") String schemaName, @Value("${relatable-storage.table-name}") String tableName, @Value("${relatable-storage.compression:LOW}") Compression compression) {
-		return new RelaTableStorage(jdbcOperations, tableName, new DirectBlobExtractor(), new PipeBasedBinaryStreamProvider(), compression, false, schemaName, null) {
+	StorageOperations storage(JdbcOperations jdbcOperations, @Value("${relatable-storage.schema-name:#{null}}") String schemaName, @Value("${relatable-storage.table-name}") String tableName, @Value("${relatable-storage.compression:LOW}") Compression compression, @Value("${relatable-storage.password:#{null}}") char[] password) {
+		return new RelaTableStorage(jdbcOperations, tableName, new DirectBlobExtractor(), new PipeBasedBinaryStreamProvider(), compression, false, schemaName, password) {
 			private final Logger log = LoggerFactory.getLogger(getClass());
 
 			@Override
