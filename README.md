@@ -42,17 +42,23 @@ RelaTable Storage Web App
    ```yml
    spring:
      datasource:
-       url: '<RDBMS JDBC URL>'
+       url: '<RDBMS JDBC URL>'      # mandatory
        username: '<RDBMS username>'
        password: '<RDBMS password>'
      servlet:
        multipart:
-         max-file-size: 25MB
-         max-request-size: 26MB
+         max-file-size: 25MB    # optional, default is only 1MB
+         max-request-size: 26MB # optional, default is 10MB
    relatable-storage:
-     table-name: 'STORAGE'
-     schema-name: '<Schema containing the STORAGE table; omit if no schema prefix is needed>'
-     compression: '<NONE|LOW|MEDIUM|HIGH>'
+     table-name: 'STORAGE'   # mandatory
+     schema-name: 'MYSCHEMA' # optional, the schema containing the STORAGE table; omit if no schema prefix is needed
+     compression: MEDIUM     # optional, choose between [NONE|LOW|MEDIUM|HIGH], default is LOW
+   http:
+     hsts:
+       enabled: true             # optional, default true
+       max-age: 31536000         # optional, default 31536000 (one year)
+       include-sub-domains: true # optional, default true
+       preload: false            # optional, default false
    ```
 
 ### Standalone JAR
