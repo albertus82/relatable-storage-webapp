@@ -32,7 +32,7 @@ RelaTable Storage Web App
        last_modified    TIMESTAMP NOT NULL,
        compressed       NUMERIC(1, 0) NOT NULL CHECK (compressed IN (0, 1)),
        encrypted        NUMERIC(1, 0) NOT NULL CHECK (encrypted IN (0, 1)),
-       file_contents    BLOB /* LONGBLOB */ NOT NULL,
+       file_contents    /*LONG*/BLOB NOT NULL,
        creation_time    TIMESTAMP DEFAULT CURRENT_TIMESTAMP NOT NULL
    );
    ```
