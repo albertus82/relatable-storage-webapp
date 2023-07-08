@@ -2,6 +2,7 @@ package io.github.albertus82.storage.config;
 
 import java.util.Collections;
 
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -25,8 +26,24 @@ import io.github.albertus82.storage.service.UserService;
 public class SecurityConfig {
 
 	@Bean
-	SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
-		http.authorizeHttpRequests((registry) -> registry.anyRequest().authenticated()).httpBasic(Customizer.withDefaults()).csrf(csrf -> csrf.disable());
+	SecurityFilterChain securityFilterChain(HttpSecurity http, @Value("${http.hsts.enabled:true}") boolean hstsEnabled, @Value("${http.hsts.max-age:#{null}}") Integer hstsMaxAgeSeconds, @Value("${http.hsts.include-sub-domains:#{null}}") Boolean hstsIncludeSubDomains, @Value("${http.hsts.preload:#{null}}") Boolean hstsPreload) throws Exception {
+		http.authorizeHttpRequests(registry -> registry.anyRequest().authenticated()).httpBasic(Customizer.withDefaults()).csrf(csrf -> csrf.disable());
+		http.headers(headers -> headers.httpStrictTransportSecurity(hsts -> {
+			if (hstsEnabled) {
+				if (hstsMaxAgeSeconds != null) {
+					hsts.maxAgeInSeconds(hstsMaxAgeSeconds);
+				}
+				if (hstsIncludeSubDomains != null) {
+					hsts.includeSubDomains(hstsIncludeSubDomains);
+				}
+				if (hstsPreload != null) {
+					hsts.preload(hstsPreload);
+				}
+			}
+			else {
+				hsts.disable();
+			}
+		}));
 		return http.build();
 	}
 
