@@ -53,6 +53,7 @@ RelaTable Storage Web App
      table-name: 'STORAGE'   # mandatory
      schema-name: 'MYSCHEMA' # optional, the schema containing the STORAGE table; omit if no schema prefix is needed
      compression: MEDIUM     # optional, choose between [NONE|LOW|MEDIUM|HIGH], default is LOW
+     password: 'P4$$w0Rd'    # optional, enables data encryption
    http:
      hsts:
        enabled: true             # optional, default true
