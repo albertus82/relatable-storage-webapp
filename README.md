@@ -50,14 +50,15 @@ RelaTable Storage Web App
          max-file-size: 25MB    # optional, default is only 1MB
          max-request-size: 26MB # optional, default is 10MB
    relatable-storage:
-     table-name: 'STORAGE'   # mandatory
-     schema-name: 'MYSCHEMA' # optional, the schema containing the STORAGE table; omit if no schema prefix is needed
-     compression: MEDIUM     # optional, choose between [NONE|LOW|MEDIUM|HIGH], default is LOW
-     password: 'P4$$w0Rd'    # optional, enables data encryption, default is null (no encryption)
+     table-name: 'STORAGE'       # mandatory
+     schema-name: 'MYSCHEMA'     # optional, the schema containing the STORAGE table; omit if no schema prefix is needed
+     compression: MEDIUM         # optional, one of the following: (NONE|LOW|MEDIUM|HIGH); default is LOW
+     password: 'P4$$w0Rd'        # optional, enables data encryption, default is null (no encryption)
+     content-disposition: INLINE # optional, one of the following: (INLINE|ATTACHMENT), default is ATTACHMENT
    http:
      hsts:
        enabled: true             # optional, default is true
-       max-age: 31536000         # optional, default is 31536000 (one year)
+       max-age: 63072000         # optional, default is 31536000 (one year)
        include-sub-domains: true # optional, default is true
        preload: false            # optional, default is false
    ```
