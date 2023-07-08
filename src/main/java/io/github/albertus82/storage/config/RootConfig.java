@@ -14,14 +14,14 @@ import io.github.albertus82.storage.StorageOperations;
 import io.github.albertus82.storage.io.Compression;
 import io.github.albertus82.storage.jdbc.RelaTableStorage;
 import io.github.albertus82.storage.jdbc.read.DirectBlobExtractor;
-import io.github.albertus82.storage.jdbc.write.PipeBasedBinaryStreamProvider;
+import io.github.albertus82.storage.jdbc.write.FileBufferedBinaryStreamProvider;
 
 @Configuration
 public class RootConfig {
 
 	@Bean
 	StorageOperations storage(JdbcOperations jdbcOperations, @Value("${relatable-storage.schema-name:#{null}}") String schemaName, @Value("${relatable-storage.table-name}") String tableName, @Value("${relatable-storage.compression:LOW}") Compression compression) {
-		return new RelaTableStorage(jdbcOperations, tableName, new DirectBlobExtractor(), new PipeBasedBinaryStreamProvider(), compression, false, schemaName, null) {
+		return new RelaTableStorage(jdbcOperations, tableName, new DirectBlobExtractor(), new FileBufferedBinaryStreamProvider(), compression, false, schemaName, null) {
 			private final Logger log = LoggerFactory.getLogger(getClass());
 
 			@Override
