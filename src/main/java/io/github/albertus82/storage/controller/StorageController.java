@@ -8,8 +8,12 @@ import java.net.URISyntaxException;
 import java.net.URL;
 import java.nio.charset.StandardCharsets;
 import java.util.List;
+import java.util.Locale;
 import java.util.Objects;
+import java.util.Set;
 
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.io.InputStreamResource;
 import org.springframework.core.io.Resource;
 import org.springframework.http.HttpHeaders;
@@ -33,17 +37,27 @@ import io.github.albertus82.storage.service.StorageService;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Size;
-import lombok.RequiredArgsConstructor;
 
 @RestController
 @RequestMapping("/api/v1/storage")
-@RequiredArgsConstructor
 @Validated
 public class StorageController {
 
 	private static final short FILENAME_MAXLENGTH = 1024;
 
 	private final StorageService storageService;
+	private final String contentDisposition;
+
+	@Autowired
+	public StorageController(StorageService storageService, @Value("${relatable-storage.content-disposition:attachment}") String contentDisposition) {
+		Objects.requireNonNull(contentDisposition, "contentDisposition must not be null");
+		contentDisposition = contentDisposition.trim().toLowerCase(Locale.ROOT);
+		if (!Set.of("inline", "attachment").contains(contentDisposition)) {
+			throw new IllegalArgumentException("contentDisposition must be \"inline\" or \"attachment\"");
+		}
+		this.storageService = storageService;
+		this.contentDisposition = contentDisposition;
+	}
 
 	@GetMapping
 	public List<ResourceDTO> get(@RequestParam(name = "patterns", defaultValue = "") String[] patterns, HttpServletRequest request) throws IOException {
@@ -64,7 +78,7 @@ public class StorageController {
 		}
 		filename = filename.trim();
 		final var resource = storageService.get(filename);
-		return ResponseEntity.ok().header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename*=UTF-8''" + UriUtils.encodeFragment(filename.substring(filename.lastIndexOf('/') + 1), StandardCharsets.UTF_8)).contentLength(resource.contentLength()).lastModified(resource.lastModified()).body(resource);
+		return ResponseEntity.ok().header(HttpHeaders.CONTENT_DISPOSITION, contentDisposition + "; filename*=UTF-8''" + UriUtils.encodeFragment(filename.substring(filename.lastIndexOf('/') + 1), StandardCharsets.UTF_8)).contentLength(resource.contentLength()).lastModified(resource.lastModified()).body(resource);
 	}
 
 	@PostMapping(consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
