@@ -11,6 +11,7 @@ import org.springframework.core.io.Resource;
 import com.fasterxml.jackson.databind.PropertyNamingStrategies;
 import com.fasterxml.jackson.databind.annotation.JsonNaming;
 
+import lombok.NonNull;
 import lombok.SneakyThrows;
 import lombok.Value;
 
@@ -25,7 +26,7 @@ public class ResourceDTO implements Comparable<ResourceDTO> {
 	URL url;
 
 	@SneakyThrows(IOException.class)
-	public ResourceDTO(final Resource resource, final URL url) {
+	public ResourceDTO(@NonNull final Resource resource, @NonNull final URL url) {
 		this.filename = resource.getFilename();
 		this.contentLength = resource.contentLength();
 		this.lastModified = new Date(resource.lastModified());

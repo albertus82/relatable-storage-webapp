@@ -3,7 +3,6 @@ package io.github.albertus82.storage.service;
 import java.io.IOException;
 import java.nio.file.FileAlreadyExistsException;
 import java.nio.file.NoSuchFileException;
-import java.nio.file.OpenOption;
 import java.util.List;
 
 import org.springframework.core.io.Resource;
@@ -14,7 +13,7 @@ public interface StorageService {
 
 	Resource get(String filename) throws NoSuchFileException, IOException;
 
-	Resource put(Resource resource, String filename, OpenOption... options) throws FileAlreadyExistsException, IOException;
+	Resource put(Resource resource, String filename) throws FileAlreadyExistsException, IOException;
 
 	Resource move(String oldFilename, String newFilename) throws NoSuchFileException, FileAlreadyExistsException, IOException;
 

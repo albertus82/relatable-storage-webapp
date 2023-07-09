@@ -10,6 +10,7 @@ import org.springframework.transaction.annotation.Transactional;
 import io.github.albertus82.storage.config.CacheConfig;
 import io.github.albertus82.storage.dto.UserDTO;
 import io.github.albertus82.storage.repository.UserRepository;
+import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 
 @Service
@@ -21,7 +22,7 @@ public class UserServiceImpl implements UserService {
 
 	@Override
 	@Cacheable(cacheManager = CacheConfig.CACHE_MANAGER, cacheNames = "users")
-	public Optional<UserDTO> findByUsername(final String username) {
+	public Optional<UserDTO> findByUsername(@NonNull final String username) {
 		return userRepository.findByUsernameIgnoringCase(username).map(UserDTO::new);
 	}
 

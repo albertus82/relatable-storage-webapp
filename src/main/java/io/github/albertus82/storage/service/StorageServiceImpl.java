@@ -1,7 +1,6 @@
 package io.github.albertus82.storage.service;
 
 import java.io.IOException;
-import java.nio.file.OpenOption;
 import java.nio.file.StandardCopyOption;
 import java.util.List;
 
@@ -32,8 +31,8 @@ public class StorageServiceImpl implements StorageService {
 
 	@Override
 	@Transactional
-	public Resource put(Resource resource, String filename, OpenOption... options) throws IOException {
-		return storage.put(resource, filename, options);
+	public Resource put(Resource resource, String filename) throws IOException {
+		return storage.put(resource, filename);
 	}
 
 	@Override

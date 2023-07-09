@@ -1,5 +1,7 @@
 package io.github.albertus82.storage.controller;
 
+import static io.github.albertus82.storage.constants.UserRole.UserRoleNames.*;
+
 import java.io.IOException;
 import java.io.UncheckedIOException;
 import java.net.MalformedURLException;
@@ -9,7 +11,6 @@ import java.net.URL;
 import java.nio.charset.StandardCharsets;
 import java.util.List;
 import java.util.Locale;
-import java.util.Objects;
 import java.util.Set;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -20,6 +21,7 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.annotation.Secured;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -37,10 +39,12 @@ import io.github.albertus82.storage.service.StorageService;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Size;
+import lombok.NonNull;
 
 @RestController
 @RequestMapping("/api/v1/storage")
 @Validated
+@Secured(RW)
 public class StorageController {
 
 	private static final short FILENAME_MAXLENGTH = 1024;
@@ -49,8 +53,7 @@ public class StorageController {
 	private final String contentDisposition;
 
 	@Autowired
-	public StorageController(StorageService storageService, @Value("${relatable-storage.content-disposition:attachment}") String contentDisposition) {
-		Objects.requireNonNull(contentDisposition, "contentDisposition must not be null");
+	public StorageController(StorageService storageService, @Value("${relatable-storage.content-disposition:attachment}") @NonNull String contentDisposition) {
 		contentDisposition = contentDisposition.trim().toLowerCase(Locale.ROOT);
 		if (!Set.of("inline", "attachment").contains(contentDisposition)) {
 			throw new IllegalArgumentException("contentDisposition must be \"inline\" or \"attachment\"");
@@ -60,6 +63,7 @@ public class StorageController {
 	}
 
 	@GetMapping
+	@Secured({ RO, RW })
 	public List<ResourceDTO> get(@RequestParam(name = "patterns", defaultValue = "") String[] patterns, HttpServletRequest request) throws IOException {
 		return storageService.list(patterns).stream().map(resource -> {
 			try {
@@ -72,11 +76,12 @@ public class StorageController {
 	}
 
 	@GetMapping(produces = MediaType.APPLICATION_OCTET_STREAM_VALUE, params = "filename")
-	public ResponseEntity<Resource> get(@RequestParam(name = "filename", required = false) @Size(max = FILENAME_MAXLENGTH) String filename) throws IOException {
-		if (filename == null || filename.isBlank()) {
-			throw new IllegalArgumentException("filename must not be null or blank");
-		}
+	@Secured({ RO, RW })
+	public ResponseEntity<Resource> get(@RequestParam(name = "filename", required = false) @Size(max = FILENAME_MAXLENGTH) @NonNull String filename) throws IOException {
 		filename = filename.trim();
+		if (filename.isEmpty()) {
+			throw new IllegalArgumentException("filename must not be blank");
+		}
 		final var resource = storageService.get(filename);
 		return ResponseEntity.ok().header(HttpHeaders.CONTENT_DISPOSITION, contentDisposition + "; filename*=UTF-8''" + UriUtils.encodeFragment(filename.substring(filename.lastIndexOf('/') + 1), StandardCharsets.UTF_8)).contentLength(resource.contentLength()).lastModified(resource.lastModified()).body(resource);
 	}
@@ -104,8 +109,7 @@ public class StorageController {
 		storageService.delete(filename.trim());
 	}
 
-	private static String encodeFilename(final String filename) {
-		Objects.requireNonNull(filename, "filename must not be null");
+	private static String encodeFilename(@NonNull final String filename) {
 		return UriUtils.encodeQueryParam(filename, StandardCharsets.UTF_8);
 	}
 
