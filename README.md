@@ -75,12 +75,12 @@ RelaTable Storage Web App
 2. Start the web app:
    
    ```console
-   java -Dspring.config.location="<directory containing the external application.yml>" -jar relatable-storage-webapp.jar
+   java -Dspring.config.additional-location="<your custom configuration file>" -jar relatable-storage-webapp.jar
    ```
 
 ### WAR
 
-1. Set an environment or context variable named `spring.config.additional-location` referencing the directory that contains your custom configuration file.
+1. Set an environment or context variable named `spring.config.additional-location` referencing your custom configuration file.
 2. Build the WAR:
    
    ```console
