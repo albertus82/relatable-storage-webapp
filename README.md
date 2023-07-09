@@ -10,6 +10,7 @@ RelaTable Storage Web App
    CREATE TABLE users (
        username        VARCHAR(128 /* CHAR */) NOT NULL PRIMARY KEY,
        password        VARCHAR(60 /* BYTE */) NOT NULL,
+       role            VARCHAR(2 /* BYTE */) NOT NULL CHECK (role IN ('RO', 'RW')),
        creation_time   TIMESTAMP DEFAULT CURRENT_TIMESTAMP NOT NULL
    );
    ```
@@ -19,7 +20,7 @@ RelaTable Storage Web App
    2. Insert a row into `USERS` table:
       
       ```sql
-      INSERT INTO users (username, password) VALUES ('admin', <the password hash>);
+      INSERT INTO users (username, password, role) VALUES ('admin', <the password hash>, 'RW');
       ```
 
 4. Create `STORAGE` table:
