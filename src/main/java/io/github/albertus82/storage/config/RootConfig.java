@@ -22,7 +22,7 @@ public class RootConfig {
 	@Bean
 	StorageOperations storage(JdbcOperations jdbcOperations, @Value("${relatable-storage.schema-name:#{null}}") String schemaName, @Value("${relatable-storage.table-name}") String tableName, @Value("${relatable-storage.compression:LOW}") Compression compression, @Value("${relatable-storage.password:#{null}}") char[] password) {
 		return new RelaTableStorage(jdbcOperations, tableName, new DirectBlobExtractor(), new PipeBasedBinaryStreamProvider(), compression, false, schemaName, password) {
-			private final Logger log = LoggerFactory.getLogger(getClass());
+			private static final Logger log = LoggerFactory.getLogger(RelaTableStorage.class); // NOSONAR Update this logger to use ".class". Loggers should be named for their enclosing classes (java:S3416)
 
 			@Override
 			protected void logStatement(final String sql) {
