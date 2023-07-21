@@ -21,6 +21,7 @@ RelaTable Storage Web App
       
       ```sql
       INSERT INTO users (username, password, role) VALUES ('admin', <the password hash>, 'RW');
+      COMMIT WORK;
       ```
 
 4. Create `STORAGE` table:
