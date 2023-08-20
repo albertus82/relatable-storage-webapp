@@ -1,6 +1,7 @@
 package io.github.albertus82.storage.config;
 
 import java.util.Collections;
+import java.util.concurrent.TimeUnit;
 
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
@@ -57,9 +58,8 @@ public class SecurityConfig {
 
 	@Bean
 	AuthenticationProvider authenticationProvider(UserDetailsService userDetailsService, PasswordEncoder passwordEncoder) {
-		final var authProvider = new DaoAuthenticationProvider();
+		final var authProvider = new DaoAuthenticationProvider(passwordEncoder);
 		authProvider.setUserDetailsService(userDetailsService);
-		authProvider.setPasswordEncoder(passwordEncoder);
 		return authProvider;
 	}
 
@@ -69,8 +69,16 @@ public class SecurityConfig {
 	}
 
 	@Bean
-	UserDetailsService userDetailsService(UserService userService) {
-		return username -> userService.findByUsername(username).map(user -> new User(user.getUsername(), user.getPassword(), Collections.singleton(new SimpleGrantedAuthority(user.getRole().toString())))).orElseThrow(() -> new UsernameNotFoundException("Invalid credentials"));
+	UserDetailsService userDetailsService(UserService userService, @Value("${http.auth.fail-delay-millis:4000}") short delay) {
+		return username -> userService.findByUsername(username).map(user -> new User(user.getUsername(), user.getPassword(), Collections.singleton(new SimpleGrantedAuthority(user.getRole().toString())))).orElseGet(() -> {
+			try {
+				TimeUnit.MILLISECONDS.sleep(delay);
+			}
+			catch (final InterruptedException e) {
+				Thread.currentThread().interrupt();
+			}
+			throw new UsernameNotFoundException("Invalid credentials");
+		});
 	}
 
 }

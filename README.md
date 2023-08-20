@@ -58,6 +58,8 @@ RelaTable Storage Web App
      password: 'P4$$w0Rd'        # optional, enables data encryption; default is null (no encryption)
      content-disposition: INLINE # optional, one of the following: (INLINE|ATTACHMENT); default is ATTACHMENT
    http:
+     auth:
+       fail-delay-millis: 5000   # optional, default is 4000
      hsts:
        enabled: true             # optional, default is true
        max-age: 63072000         # optional, default is 31536000 (one year)
