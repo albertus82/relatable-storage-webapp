@@ -57,6 +57,7 @@ RelaTable Storage Web App
      compression: MEDIUM         # optional, one of the following: (NONE|LOW|MEDIUM|HIGH); default is LOW
      password: 'P4$$w0Rd'        # optional, enables data encryption; default is null (no encryption)
      content-disposition: INLINE # optional, one of the following: (INLINE|ATTACHMENT); default is ATTACHMENT
+     directory: '/opt/relatable-storage/files/'
    http:
      auth:
        fail-delay-millis: 5000   # optional, default is 4000

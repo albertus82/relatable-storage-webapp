@@ -15,7 +15,7 @@ import lombok.RequiredArgsConstructor;
 @Service
 @Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
 @RequiredArgsConstructor
-public class StorageServiceImpl implements StorageService {
+public class DatabaseStorageService implements StorageService {
 
 	private final StorageOperations storage;
 

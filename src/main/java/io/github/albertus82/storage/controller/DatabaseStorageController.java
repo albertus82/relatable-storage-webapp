@@ -35,25 +35,25 @@ import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.util.UriUtils;
 
 import io.github.albertus82.storage.dto.ResourceDTO;
-import io.github.albertus82.storage.service.StorageService;
+import io.github.albertus82.storage.service.DatabaseStorageService;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Size;
 import lombok.NonNull;
 
 @RestController
-@RequestMapping("/api/v1/storage")
+@RequestMapping("/api/v1/storage/db")
 @Validated
 @Secured(RW)
-public class StorageController {
+public class DatabaseStorageController {
 
 	private static final short FILENAME_MAXLENGTH = 1024;
 
-	private final StorageService storageService;
+	private final DatabaseStorageService storageService;
 	private final String contentDisposition;
 
 	@Autowired
-	public StorageController(StorageService storageService, @Value("${relatable-storage.content-disposition:attachment}") @NonNull String contentDisposition) {
+	public DatabaseStorageController(DatabaseStorageService storageService, @Value("${relatable-storage.content-disposition:attachment}") @NonNull String contentDisposition) {
 		contentDisposition = contentDisposition.trim().toLowerCase(Locale.ROOT);
 		if (!Set.of("inline", "attachment").contains(contentDisposition)) {
 			throw new IllegalArgumentException("contentDisposition must be \"inline\" or \"attachment\"");
