@@ -25,3 +25,5 @@ relatable-storage:
   table-name: STORAGE
   password: 'P4$$w0Rd'
   content-disposition: INLINE
+  directory: test
+
