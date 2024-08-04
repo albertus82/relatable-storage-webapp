@@ -1,6 +1,7 @@
 package io.github.albertus82.storage.service;
 
 import java.io.IOException;
+import java.net.URI;
 import java.nio.file.AtomicMoveNotSupportedException;
 import java.nio.file.Files;
 import java.nio.file.LinkOption;
@@ -19,15 +20,20 @@ public class FileSystemStorageService implements StorageService {
 
 	private final Path directory;
 
-	public FileSystemStorageService(@Value("${relatable-storage.directory}") Path directory) {
-		this.directory = directory;
+	public FileSystemStorageService(@Value("${relatable-storage.directory}") Path directory) throws IOException {
+		this.directory = directory.toRealPath();
 	}
 
 	@Override
 	public List<Resource> list(final String... patterns) throws IOException {
 		try (final var stream = Files.list(directory)) {
 			// TODO patterns https://stackoverflow.com/a/20960359/3260495
-			return stream.map(e -> new FileSystemResource(e)).collect(Collectors.toList());
+			return stream.map(e -> new FileSystemResource(e) {
+				@Override
+				public URI getURI() throws IOException {
+					return URI.create(super.getURI().toString().replaceFirst(directory.toString(), ""));
+				}
+			}).collect(Collectors.toList());
 		}
 	}
 
@@ -77,5 +83,17 @@ public class FileSystemStorageService implements StorageService {
 		}
 		return path;
 	}
+
+//	public class MyFileSystemResource extends FileSystemResource {
+//
+//		public MyFileSystemResource(Path filePath) {
+//			super(filePath);
+//		}
+//
+//		@Override
+//		public URI getURI() throws IOException {
+//			return URI.create(super.getURI().toString().replaceFirst(directory.toString(), ""));
+//		}
+//	}
 
 }
